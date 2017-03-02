@@ -1,15 +1,16 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 from datetime import datetime
 
 class Deck(models.Model):
-    owner = models.ForeignKey(Users,on_delete=models.CASCADE)
-    name = models.CharFiled(max_length=255)
+    owner = models.ForeignKey(User,on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
     description = models.TextField()
 
 
 class Flashcard(models.Model):
-    owner = models.ForeignKey(Users,on_delete=models.CASCADE)
+    owner = models.ForeignKey(User,on_delete=models.CASCADE)
     deck = models.ForeignKey(Deck)
     question = models.TextField()
     answer = models.TextField()

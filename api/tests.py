@@ -1,29 +1,38 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
+from django.contrib.auth.models import User
+from django.urls import reverse
 
-class APIFactoryTestCase(APITestCase):
+from .models import Deck, Flashcard
+
+class APITestCase(TestCase):
 
     def setUp(self):
-        self.factory=APIRequestFactory()
         self.user = User.objects.create(username='test')
+        self.client = APIClient()
+        #self.client.force_authenticate(user=self.user)
 
-    def test_devices_list_empty(self):
-        request = self.factory.get('fake-path')
-        force_authenticate(request, user=self.user)
-        response = device_list(request)
+    def test_get_decks_list(self):
+        #import ipdb; ipdb.set_trace()
+        deck = Deck.objects.create(owner = self.user,
+                                   name = 'test_deck',
+                                   description = 'test_descriprion')
+
+        response = self.client.get(reverse('decks-list'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['fullsize'], 0)
-        self.assertEqual(response.data['items'], [])
+        self.assertEqual(response.data, {'id':1, 'name':'test_deck',
+                          'description': 'test_descriprion'})
 
-    def test_devices_list_one_required(self):
-        Device.objects.create_device({'name':'some-dev'})
 
-        request = self.factory.get('fake-path', HTTP_HOST='localhost')
-        force_authenticate(request, user=self.user)
-        response = device_list(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['fullsize'], 1)
-        self.assertNotEqual(response.data['items'][0]['dev_id'],'')
-        self.assertEqual(response.data['items'][0]['name'],'some-dev')
+        # node = Datanode.objects.filter(name='Temperature')
+        # self.assertEqual(response.status_code, 201)
+        # self.assertEqual(len(node), 1)
+        # self.assertEqual(node[0].node_path, 'Some/Path')
+        # self.assertEqual(node[0].unit, 'c')
+        # self.assertEqual(node[0].device.name, 'test_device')
+
+        # point = Datapoint.objects.filter(node__name='Temperature')
+        # self.assertEqual(len(point), 1)
+        # self.assertEqual(point[0].value, '42')
 

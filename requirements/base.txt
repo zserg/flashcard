@@ -1,4 +1,5 @@
 Django==1.10.5
 django-environ==0.4.1
+djangorestframework==3.5.4
 
 
