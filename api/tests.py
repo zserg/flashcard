@@ -21,8 +21,25 @@ class APITestCase(TestCase):
 
         response = self.client.get(reverse('decks-list'))
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [{'id':1, 'name':'test_deck',
+                          'description': 'test_descriprion'}])
+
+    def test_get_deck(self):
+        deck = Deck.objects.create(owner = self.user,
+                                   name = 'test_deck',
+                                   description = 'test_descriprion')
+
+        response = self.client.get(reverse('deck-details', args=[1]))
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {'id':1, 'name':'test_deck',
                           'description': 'test_descriprion'})
+
+    def test_create_deck(self):
+        response = self.client.post(reverse('decks-list'), {'name':'new_name',
+                                                             'description':'new_description'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'id':1, 'name':'new_name',
+                          'description': 'new_description'})
 
 
         # node = Datanode.objects.filter(name='Temperature')

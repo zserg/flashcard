@@ -18,6 +18,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^flashcard/api/v1/', include('api.urls')),
+    url(r'^flashcard/v1/', include('api.urls')),
 
 ]
