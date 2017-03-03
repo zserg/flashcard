@@ -11,7 +11,7 @@ class APITestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create(username='test')
         self.client = APIClient()
-        #self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.user)
 
     def test_get_decks_list(self):
         #import ipdb; ipdb.set_trace()
@@ -37,7 +37,7 @@ class APITestCase(TestCase):
     def test_create_deck(self):
         response = self.client.post(reverse('decks-list'), {'name':'new_name',
                                                              'description':'new_description'})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data, {'id':1, 'name':'new_name',
                           'description': 'new_description'})
 
