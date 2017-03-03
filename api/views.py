@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 
 from .models import Deck, Flashcard
-from .serializers import DeckSerializer
+from .serializers import DeckSerializer, CardSerializer
 
 class JSONResponse(HttpResponse):
     """
@@ -52,6 +52,26 @@ def deck_details(request, id):
         serializer = DeckSerializer(deck)
         return Response(serializer.data)
 
-def flashcards_list(request):
-    return Response("yes")
+@api_view(['GET', 'POST'])
+@csrf_exempt
+def cards_list(request):
+    #import ipdb; ipdb.set_trace()
+    """
+    List all flashcards
+    """
+    if request.method == 'GET':
+        cards = Flashcard.objects.all()
+        serializer = CardSerializer(cards, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = DeckSerializer(data=request.data)
+        if serializer.is_valid():
+            if request.user.is_anonymous:
+                return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                serializer.save(owner=request.user)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 

@@ -6,5 +6,9 @@ class DeckSerializer(serializers.ModelSerializer):
         model = Deck
         fields = ('id', 'name', 'description')
 
-
+class CardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Flashcard
+        fields = ('id', 'deck', 'question', 'answer', 'easiness', 'consec_correct_answers')
+        read_only_fields = ('created_at', 'last_shown_at', 'next_due_date')
 

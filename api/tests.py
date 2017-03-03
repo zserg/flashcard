@@ -41,15 +41,29 @@ class APITestCase(TestCase):
         self.assertEqual(response.data, {'id':1, 'name':'new_name',
                           'description': 'new_description'})
 
+    def test_get_cards_list(self):
+        deck = Deck.objects.create(owner = self.user,
+                                   name = 'test_deck',
+                                   description = 'test_descriprion')
+        deck = Flashcard.objects.create(owner = self.user,
+                                   deck = deck,
+                                   question = 'test_question',
+                                   answer = 'test_answer',
+                                   easiness = 0,
+                                   consec_correct_answers = 0)
 
-        # node = Datanode.objects.filter(name='Temperature')
-        # self.assertEqual(response.status_code, 201)
-        # self.assertEqual(len(node), 1)
-        # self.assertEqual(node[0].node_path, 'Some/Path')
-        # self.assertEqual(node[0].unit, 'c')
-        # self.assertEqual(node[0].device.name, 'test_device')
+        response = self.client.get(reverse('cards-list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [{'id':1, 'deck':deck.id, 'question':'test_question',
+             'answer':'test_answer', 'easiness':0, 'consec_correct_answers':0}])
 
-        # point = Datapoint.objects.filter(node__name='Temperature')
-        # self.assertEqual(len(point), 1)
-        # self.assertEqual(point[0].value, '42')
+    # owner = models.ForeignKey(User,on_delete=models.CASCADE)
+    # deck = models.ForeignKey(Deck)
+    # question = models.TextField()
+    # answer = models.TextField()
+    # created_at = models.DateTimeField(auto_now_add=True)
+    # last_shown_at = models.DateTimeField(auto_now_add=True)
+    # next_due_date = models.DateTimeField(auto_now_add=True)
+    # easiness = models.IntegerField(default=0)
+    # consec_correct_answers = models.IntegerField(default=0)
 
