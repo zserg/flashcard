@@ -16,7 +16,6 @@ class TestDeck(object):
                        'description': self.deck.description}
 
 
-
 class APITestCase(TestCase):
 
     def setUp(self):
@@ -56,13 +55,17 @@ class APITestCase(TestCase):
         deck1 = TestDeck(self.user1);
         deck2 = TestDeck(self.user2);
 
-        response = self.client.get(reverse('deck-details', args=[1]))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, {})
-
         response = self.client.get(reverse('deck-details', args=[2]))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(deck1.details == response.data, True)
+        self.assertEqual(response.data, deck2.details)
+
+    def test_get_deck_details_not_owner(self):
+        self.client.force_authenticate(user=self.user2)
+        deck1 = TestDeck(self.user1);
+        deck2 = TestDeck(self.user2);
+
+        response = self.client.get(reverse('deck-details', args=[1]))
+        self.assertEqual(response.status_code, 404)
 
     # def test_create_deck(self):
     #     response = self.client.post(reverse('decks-list'), {'name':'new_name',

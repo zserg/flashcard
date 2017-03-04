@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
+from django.shortcuts import get_object_or_404
 
 from .models import Deck, Flashcard
 from .serializers import DeckSerializer, CardSerializer
@@ -46,9 +47,10 @@ def deck_details(request, id):
     """
     Deck details
     """
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     if request.method == 'GET':
-        deck = Deck.objects.filter(pk=id, owner=request.user)
+        #deck = Deck.objects.filter(pk=id, owner=request.user)
+        deck = get_object_or_404(Deck, pk=id, owner=request.user)
         serializer = DeckSerializer(deck)
         return Response(serializer.data)
 
