@@ -47,7 +47,8 @@ DJANGO_APPS = (
     'django.contrib.staticfiles',
 )
 
-THIRD_PARTY_APPS = ('rest_framework',)
+THIRD_PARTY_APPS = ('rest_framework',
+                    'rest_framework.authtoken',)
 
 LOCAL_APPS = ('api',)
 
@@ -149,8 +150,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = str(APPS_DIR('media'))
 
 REST_FRAMEWORK = {
-     # 'DEFAULT_PERMISSION_CLASSES': [
-     #               'rest_framework.permissions.IsAdminUser',
-     # ],
+     'DEFAULT_PERMISSION_CLASSES': [
+            'rest_framework.permissions.IsAuthenticated',
+     ],
+     'DEFAULT_AUTHENTICATION_CLASSES': [
+           'rest_framework.authentication.TokenAuthentication',
+     ],
      'PAGE_SIZE': 10
 }
