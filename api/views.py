@@ -43,14 +43,14 @@ def decks_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
-def deck_details(request, id):
+def deck_details(request, deck_id):
     """
     Deck details
     """
     #import ipdb; ipdb.set_trace()
     if request.method == 'GET':
         #deck = Deck.objects.filter(pk=id, owner=request.user)
-        deck = get_object_or_404(Deck, pk=id, owner=request.user)
+        deck = get_object_or_404(Deck, pk=deck_id, owner=request.user)
         serializer = DeckSerializer(deck)
         return Response(serializer.data)
 
@@ -77,15 +77,15 @@ def cards_list(request, deck=None):
             else:
                 serializer.save(owner=request.user)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_401_BAD_REQUEST)
 
 @api_view(['GET'])
-def card_details(request, id):
+def card_details(request, deck_id):
     """
     Card details
     """
     if request.method == 'GET':
-        card = Card.objects.filter(pk=id)
+        card = Card.objects.filter(pk=deck_id)
         serializer = CardSerializer(card)
         return Response(serializer.data)
 
