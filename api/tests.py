@@ -3,37 +3,41 @@ from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
+from itertools import count
 
 from .models import Deck, Flashcard
 
 
 class TestDeck(object):
-    def __init__(self,  user):
-        self.deck = Deck.objects.create(owner = user,
-                        name = 'name_' + str(user),
-                        description = 'description_' + str(user))
-        self.details = {'id': self.deck.id, 'name': self.deck.name,
-                       'description': self.deck.description}
-        self.post_details = {'name': self.deck.name,
-                       'description': self.deck.description}
+    _ids = count(1)
 
-
-class DeckTestData(object):
-    def __init__(self, user, id):
-        name = 'name_'+str(user)+' '+str(id)
-        description = 'description_'+str(user)+' '+str(id)
-        self.data = {'name': name, 'description': description}
+    def __init__(self,  user, create=True):
+        self.name = 'name_'+str(user)+' '+str(self._ids)
+        self.description = 'description_'+str(user)+' '+str(self._ids)
+        self.data = {'name': self.name, 'description': self.description}
+        next(self._ids)
+        if create:
+            self.deck = Deck.objects.create(owner=user, name=self.name, description=self.description)
+            self.details = {'id': self.deck.id, 'name': self.deck.name,
+                           'description': self.deck.description}
 
 
 class TestCard(object):
-    def __init__(self, user, deck, easiness, consec_correct_answers):
-        question = 'question_'+str(user)
-        answer = 'answer_'+str(user)
-        self.card = Flashcard.objects.create(owner = user, deck=deck,
-                question = question, answer = answer,
-                easiness = easiness, consec_correct_answers = consec_correct_answers)
-        self.details = {'id': self.card.id, 'question': self.card.question,
-                       'answer': self.card.answer, }
+    _ids = count(1)
+
+    def __init__(self, user, deck, easiness=0, consec_correct_answers=0, create=True):
+        #import ipdb; ipdb.set_trace()
+        self.question = 'question_'+str(user)+' '+str(self._ids)
+        self.answer = 'answer_'+str(user)+' '+str(self._ids)
+        self.data = {'question': self.question, 'answer': self.answer,
+                'easiness': easiness,
+                'consec_correct_answers': consec_correct_answers}
+        if create:
+            self.card = Flashcard.objects.create(owner = user, deck=deck,
+                    question = self.question, answer = self.answer,
+                    easiness = easiness, consec_correct_answers = consec_correct_answers)
+            self.details = {'id': self.card.id, 'question': self.card.question,
+                           'answer': self.card.answer, }
 
     # owner = models.ForeignKey(User,on_delete=models.CASCADE)
     # deck = models.ForeignKey(Deck)
@@ -113,15 +117,15 @@ class APITestCase(TestCase):
 
     def test_create_deck(self):
         self.client.force_authenticate(user=self.user1)
-        data = DeckTestData(id=1, user='user1')
-        response = self.client.post(reverse('decks-list'),data.data)
+        deck1 = TestDeck(self.user1, create=False);
+        response = self.client.post(reverse('decks-list'),deck1.data)
 
         self.assertEqual(response.status_code, 201)
-        self.assertDictContainsSubset(data.data, response.data)
+        self.assertDictContainsSubset(deck1.data, response.data)
 
     def test_create_deck_noauth(self):
-        data = DeckTestData(id=1, user='user1')
-        response = self.client.post(reverse('decks-list'),data.data)
+        deck1 = TestDeck(self.user1, create=False);
+        response = self.client.post(reverse('decks-list'),deck1.data)
 
         self.assertEqual(response.status_code, 401)
 
@@ -130,7 +134,7 @@ class APITestCase(TestCase):
         deck1 = TestDeck(self.user1)
         card1 = TestCard(self.user1, deck1.deck, 0, 0)
 
-        response = self.client.get(reverse('cards-list'))
+        response = self.client.get(reverse('cards-list', args=[deck1.deck.id]))
         self.assertEqual(response.status_code, 200)
         self.assertDictContainsSubset(card1.details, response.data[0])
 
@@ -141,65 +145,31 @@ class APITestCase(TestCase):
         card2 = TestCard(self.user1, deck1.deck, 0, 0)
         card3 = TestCard(self.user1, deck1.deck, 0, 0)
 
-        response = self.client.get(reverse('cards-list'))
+        response = self.client.get(reverse('cards-list', args=[deck1.deck.id]))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 3)
 
-    def test_get_cards_list_multiple_decks(self):
+    def test_get_cards_list_nonexisting_deck(self):
+        self.client.force_authenticate(user=self.user1)
+
+        response = self.client.get(reverse('cards-list', args=[2]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_create_card(self):
         self.client.force_authenticate(user=self.user1)
         deck1 = TestDeck(self.user1)
-        deck2 = TestDeck(self.user1)
-        card1 = TestCard(self.user1, deck1.deck, 0, 0)
-        card2 = TestCard(self.user1, deck2.deck, 0, 0)
-        card3 = TestCard(self.user1, deck2.deck, 0, 0)
+        card1 = TestCard(self.user1, deck1, create=False)
+        response = self.client.post(reverse('cards-list', args=[deck1.deck.id]),card1.data)
 
-        response = self.client.get(reverse('cards-list'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 3)
+        self.assertEqual(response.status_code, 201)
+        self.assertDictContainsSubset(card1.data, response.data)
 
-    # def test_get_cards_list_by_deck(self):
-    #     deck1 = Deck.objects.create(owner = self.user,
-    #                                name = 'test_deck1',
-    #                                description = 'test_descriprion')
-    #     deck2 = Deck.objects.create(owner = self.user,
-    #                                name = 'test_deck2',
-    #                                description = 'test_descriprion')
-    #     card = Flashcard.objects.create(owner = self.user,
-    #                                deck = deck1,
-    #                                question = 'test_question',
-    #                                answer = 'test_answer',
-    #                                easiness = 0,
-    #                                consec_correct_answers = 0)
-
-    #     response = self.client.get(reverse('cards-by-deck-list', kwargs={'deck':'1'}))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(response.data, [{'id':1, 'deck':deck1.id, 'question':'test_question',
-    #          'answer':'test_answer', 'easiness':0, 'consec_correct_answers':0}])
-
-    # def test_get_cards_list_by_deck_wrong_deck(self):
-    #     deck1 = Deck.objects.create(owner = self.user,
-    #                                name = 'test_deck1',
-    #                                description = 'test_descriprion')
-    #     deck2 = Deck.objects.create(owner = self.user,
-    #                                name = 'test_deck2',
-    #                                description = 'test_descriprion')
-    #     card = Flashcard.objects.create(owner = self.user,
-    #                                deck = deck1,
-    #                                question = 'test_question',
-    #                                answer = 'test_answer',
-    #                                easiness = 0,
-    #                                consec_correct_answers = 0)
-
-    #     response = self.client.get(reverse('cards-by-deck-list', kwargs={'deck':'2'}))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(response.data, [] )
-
-    # def test_create_card(self):
-    #     response = self.client.post(reverse('decks-list'), {'name':'new_name',
-    #                                                          'description':'new_description'})
-    #     self.assertEqual(response.status_code, 201)
-    #     self.assertEqual(response.data, {'id':1, 'name':'new_name',
-    #                       'description': 'new_description'})
-
-
+    def test_update_card(self):
+        self.client.force_authenticate(user=self.user1)
+        deck1 = TestDeck(self.user1)
+        card1 = TestCard(self.user1, deck1.deck)
+        card2 = TestCard(self.user1, deck1.deck, create=False)
+        response = self.client.put(reverse('cards-details',
+             args=[deck1.deck.id, card2.card.id]), card1.data)
 

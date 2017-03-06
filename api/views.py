@@ -1,11 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from rest_framework.decorators import api_view
+from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
+
+from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from django.shortcuts import get_object_or_404
 
 from .models import Deck, Flashcard
 from .serializers import DeckSerializer, CardSerializer
@@ -56,26 +58,28 @@ def deck_details(request, deck_id):
 
 @api_view(['GET', 'POST'])
 @csrf_exempt
-def cards_list(request, deck=None):
+def cards_list(request, deck_id):
     """
     List all flashcards
     """
     #import ipdb; ipdb.set_trace()
     if request.method == 'GET':
-        if deck:
-            cards = Flashcard.objects.filter(deck__id=deck)
-        else:
-            cards = Flashcard.objects.all()
+        cards = Flashcard.objects.filter(deck__id=deck_id)
         serializer = CardSerializer(cards, many=True)
         return Response(serializer.data)
 
     elif request.method == 'POST':
+        try:
+            deck = Deck.objects.get(id=deck_id)
+        except ObjectDoesNotExist:
+            return Response(serializer.errors, status=status.HTTP_401_BAD_REQUEST)
+
         serializer = CardSerializer(data=request.data)
         if serializer.is_valid():
             if request.user.is_anonymous:
                 return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
             else:
-                serializer.save(owner=request.user)
+                serializer.save(owner=request.user, deck=deck)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_401_BAD_REQUEST)
 
