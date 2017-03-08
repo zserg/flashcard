@@ -1,9 +1,11 @@
 from django.test import TestCase
-from rest_framework.test import APIClient
-from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
+from rest_framework.test import APIClient
+from rest_framework.test import APITestCase
+
 from itertools import count
+from datetime import datetime
 
 from .models import Deck, Flashcard
 
@@ -49,6 +51,11 @@ class TestCard(object):
     # easiness = models.IntegerField(default=0)
     # consec_correct_answers = models.IntegerField(default=0)
 
+def get_inteval(resp_data):
+    #import ipdb; ipdb.set_trace()
+    last_shown = datetime.strptime(resp_data['last_shown_at'],  "%Y-%m-%dT%H:%M:%S.%fZ")
+    next_due = datetime.strptime(resp_data['next_due_date'],  "%Y-%m-%dT%H:%M:%S.%fZ")
+    return (next_due - last_shown).days
 
 class APITestCase(TestCase):
 
@@ -165,11 +172,62 @@ class APITestCase(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertDictContainsSubset(card1.data, response.data)
 
-    def test_update_card(self):
+    def test_card_details(self):
         self.client.force_authenticate(user=self.user1)
         deck1 = TestDeck(self.user1)
         card1 = TestCard(self.user1, deck1.deck)
-        card2 = TestCard(self.user1, deck1.deck, create=False)
-        response = self.client.put(reverse('cards-details',
-             args=[deck1.deck.id, card2.card.id]), card1.data)
+        response = self.client.get(reverse('card-details',
+             args=[deck1.deck.id, card1.card.id]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictContainsSubset(card1.details, response.data)
+
+    def test_card_ratings(self):
+        self.client.force_authenticate(user=self.user1)
+        deck1 = TestDeck(self.user1)
+        card1 = TestCard(self.user1, deck1.deck)
+        response = self.client.get(reverse('card-ratings',
+             args=[deck1.deck.id, card1.card.id]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual('easiness' in response.data, True)
+        self.assertEqual('last_shown_at' in response.data, True)
+        self.assertEqual('next_due_date' in response.data, True)
+
+    def test_card_set_rating(self):
+        self.client.force_authenticate(user=self.user1)
+        deck1 = TestDeck(self.user1)
+        card1 = TestCard(self.user1, deck1.deck)
+        response = self.client.post(reverse('card-ratings',
+            args=[deck1.deck.id, card1.card.id]), {'rating': 5})
+
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual('easiness' in response.data, True)
+        self.assertEqual('last_shown_at' in response.data, True)
+        self.assertEqual('next_due_date' in response.data, True)
+        self.assertEqual(get_inteval(response.data), 6)
+
+    def test_card_set_rating_unauth(self):
+        self.client.force_authenticate(user=self.user1)
+        deck1 = TestDeck(self.user1)
+        card1 = TestCard(self.user1, deck1.deck)
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.post(reverse('card-ratings',
+            args=[deck1.deck.id, card1.card.id]), {'rating': 5})
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_card_set_rating_0(self):
+        self.client.force_authenticate(user=self.user1)
+        deck1 = TestDeck(self.user1)
+        card1 = TestCard(self.user1, deck1.deck)
+        response = self.client.post(reverse('card-ratings',
+            args=[deck1.deck.id, card1.card.id]), {'rating': 0})
+
+        #import ipdb; ipdb.set_trace()
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual('easiness' in response.data, True)
+        self.assertEqual('last_shown_at' in response.data, True)
+        self.assertEqual('next_due_date' in response.data, True)
+        self.assertEqual(get_inteval(response.data), 0)
 

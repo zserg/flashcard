@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 
 from .models import Deck, Flashcard
-from .serializers import DeckSerializer, CardSerializer
+from .serializers import DeckSerializer, CardSerializer, RatingSeriallizer
 
 class JSONResponse(HttpResponse):
     """
@@ -84,12 +84,31 @@ def cards_list(request, deck_id):
         return Response(serializer.errors, status=status.HTTP_401_BAD_REQUEST)
 
 @api_view(['GET'])
-def card_details(request, deck_id):
+def card_details(request, deck_id, card_id):
     """
     Card details
     """
     if request.method == 'GET':
-        card = Card.objects.filter(pk=deck_id)
+        card = get_object_or_404(Flashcard, pk=card_id, deck__id=deck_id, owner=request.user)
         serializer = CardSerializer(card)
         return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_401_BAD_REQUEST)
 
+@api_view(['GET', 'POST'])
+def card_ratings(request, deck_id, card_id):
+    """
+    Card ratings (state)
+    """
+    if request.method == 'GET':
+        card = get_object_or_404(Flashcard, pk=card_id, deck__id=deck_id, owner=request.user)
+        serializer = RatingSeriallizer(card)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        #import ipdb; ipdb.set_trace()
+        card = get_object_or_404(Flashcard, pk=card_id, deck__id=deck_id, owner=request.user)
+        serializer = RatingSeriallizer(card,data=request.data )
+        if serializer.is_valid():
+            serializer.save(rating=request.data['rating'])
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=status.HTTP_401_BAD_REQUEST)

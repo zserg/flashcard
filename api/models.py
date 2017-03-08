@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
-from datetime import datetime
+from datetime import datetime, timedelta
+
 
 class Deck(models.Model):
     owner = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -35,23 +37,31 @@ class Flashcard(models.Model):
         """
 
         correct = (rating >= 3)
+        blank = (rating < 2)
         easiness = self.easiness - 0.8 + 0.28*rating + 0.02*rating**2
+        #import ipdb; ipdb.set_trace()
         if easiness < 1.3:
             easiness = 1.3
         if correct:
             consec_correct_answers = self.consec_correct_answers + 1
             interval = 6*easiness**(consec_correct_answers-1)
+        elif blank:
+            consec_correct_answers = 0
+            interval = 0
         else:
             consec_correct_answers = 0
             interval = 1
 
-        next_due_date = datetime.now() + datetime.timedelta(days=interval)
+        next_due_date = timezone.now() + timedelta(days=interval)
         return next_due_date, easiness, consec_correct_answers
 
     def save(self, rating=None, *args, **kwargs):
         #import ipdb; ipdb.set_trace()
         if rating:
-            self.next_due_date, self.easiness, self.consec_correct_answers =  self.get_next_due_date(self, rating)
+            result =  self.get_next_due_date(rating)
+            self.next_due_date = result[0]
+            self.easiness = result[1]
+            self.consec_correct_answers = result[2]
         super(Flashcard, self).save(*args, **kwargs) # Call the "real" save() method.
 
 
