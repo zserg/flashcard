@@ -1,5 +1,7 @@
 from django.conf.urls import url
 from api import views as api_views
+from rest_framework.authtoken import views
+
 
 urlpatterns = [
     url(r'^decks/$', api_views.decks_list, name='decks-list'),
@@ -12,3 +14,6 @@ urlpatterns = [
 
 ]
 
+urlpatterns += [
+            url(r'^api-token-auth/', views.obtain_auth_token, name='get-token')
+            ]

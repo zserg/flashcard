@@ -50,7 +50,8 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = ('rest_framework',
                     'rest_framework.authtoken',)
 
-LOCAL_APPS = ('api',)
+LOCAL_APPS = ('api',
+              'flashcardgui',)
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS;
 

@@ -66,7 +66,7 @@ class APITestCase(TestCase):
             self.assertEqual(dictionary[key], value)
 
     def setUp(self):
-        self.user1 = User.objects.create(username='user1')
+        self.user1 = User.objects.create(username='user1', password='pass1')
         self.user2 = User.objects.create(username='user2')
         self.client = APIClient()
 
@@ -230,4 +230,14 @@ class APITestCase(TestCase):
         self.assertEqual('last_shown_at' in response.data, True)
         self.assertEqual('next_due_date' in response.data, True)
         self.assertEqual(get_inteval(response.data), 0)
+
+    # def test_get_token(self):
+    #     self.client.force_authenticate(user=self.user1, password=self.user1.password)
+    #     import ipdb; ipdb.set_trace()
+    #     data = {'username': self.user1.username, 'password': self.user1.password}
+    #     response = self.client.post(reverse('get-token'), data)
+
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual('token' in response.data, True)
+
 
