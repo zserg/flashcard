@@ -19,16 +19,21 @@ class FlashcardsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_signup_get(self):
-        response = self.client.get(reverse('signup'))
+        response = self.client.get('/accounts/register/')
         #import ipdb; ipdb.set_trace()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual('form' in response.context, True)
+        self.assertIn('form', response.context)
+        self.assertIn('username', response.context['form'].fields)
+        self.assertIn('email', response.context['form'].fields)
+        self.assertIn('password1', response.context['form'].fields)
+        self.assertIn('password2', response.context['form'].fields)
 
     def test_signup_post(self):
-        data = {'username': 'testuser', 'password1': 'testpassword', 'password2': 'testpassword'}
+        data = {'username': 'testuser', 'password1': 'Testpassword',
+                'password2': 'Testpassword', 'email': 'test@example.com'}
 
-        response = self.client.post(reverse('signup'), data)
-        #import ipdb; ipdb.set_trace()
+        response = self.client.post('/accounts/register', data)
+        import ipdb; ipdb.set_trace()
         self.assertEqual(response.status_code, 301)
         self.assertEqual('form' in response.context, True)
 
