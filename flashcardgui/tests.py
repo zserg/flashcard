@@ -14,14 +14,24 @@ class FlashcardsTestCase(TestCase):
         self.client = Client()
 
     def test_login(self):
-        response = self.client.get(reverse('login'))
+        response = self.client.get('/accounts/login/')
         #import ipdb; ipdb.set_trace()
         self.assertEqual(response.status_code, 200)
 
-    def test_signup(self):
+    def test_signup_get(self):
         response = self.client.get(reverse('signup'))
         #import ipdb; ipdb.set_trace()
         self.assertEqual(response.status_code, 200)
+        self.assertEqual('form' in response.context, True)
+
+    def test_signup_post(self):
+        data = {'username': 'testuser', 'password1': 'testpassword', 'password2': 'testpassword'}
+
+        response = self.client.post(reverse('signup'), data)
+        #import ipdb; ipdb.set_trace()
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual('form' in response.context, True)
+
 
 
 

@@ -20,5 +20,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^flashcard/api/v1/', include('api.urls')),
     url(r'^flashcard/', include('flashcardgui.urls')),
-
+    url(r'^accounts/', include('registration.backends.hmac.urls')),
 ]

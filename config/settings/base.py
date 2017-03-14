@@ -48,7 +48,10 @@ DJANGO_APPS = (
 )
 
 THIRD_PARTY_APPS = ('rest_framework',
-                    'rest_framework.authtoken',)
+                    'rest_framework.authtoken',
+                    'crispy_forms',
+                    'bootstrap3',
+                    )
 
 LOCAL_APPS = ('api',
               'flashcardgui',)
@@ -159,3 +162,6 @@ REST_FRAMEWORK = {
      ],
      'PAGE_SIZE': 10
 }
+
+#django-registrayion config
+ACCOUNT_ACTIVATION_DAYS = 7
