@@ -20,23 +20,6 @@ def profile(request):
         #return render(request, 'flashcardgui/index.html',{'user':request.user})
 
 
-# def signup(request):
-#     """
-#     User signup
-#     """
-#     import ipdb; ipdb.set_trace()
-#     if request.method == 'POST':
-#         form = UserCreationForm(request.POST)
-#         if form.is_valid():
-#             user = User.objects.create(form.cleaned_data['username'],
-#                                       form.cleaned_data['password1'])
-#             user.save()
-#             return redirect('index', 'flashcardgui/index.html')
-#     else:
-#         form = UserCreationForm()
-
-#     return render(request, 'registration/signup.html', {'form':form})
-
 
 
 
