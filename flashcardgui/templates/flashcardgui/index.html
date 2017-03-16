@@ -3,7 +3,10 @@
 
 {% block title %}Flashcard Home{% endblock %}
 {% block content %}
-Home
-
+<ul>
+  {% for deck in decks %}
+  <li>{{ deck.name }}</li>
+  {% endfor %}
+</ul>
 {% endblock %}
 

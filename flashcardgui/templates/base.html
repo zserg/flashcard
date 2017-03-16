@@ -21,13 +21,13 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="{% url 'home' %}">DEMO</a>
+          <a class="navbar-brand" href="{% url 'home' %}">Flashcards</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class=""><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li class=""><a href="{% url 'home' %}">Decks</a></li>
+            <li><a href="{% url 'add-card' %}">Add</a></li>
+            <li><a href="{% url 'about' %}">About</a></li>
           </ul>
           {% block nav_user %}
             {% if user.is_authenticated %}
@@ -36,7 +36,16 @@
                   <span class="glyphicon glyphicon-user"></span>  {{ user.get_username }} &nbsp; </a>
                 </li>
                 <li>
-                  <a href="{% url 'logout' %}">Sign out</a>
+                  <a href="{% url 'logout' %}?next=/accounts/login/">Sign out</a>
+                </li>
+              </ul>
+            {% else %}
+              <ul class="nav navbar-nav navbar-right">
+                <li>
+                  <a href="{% url 'login' %}">Sign in</a>
+                </li>
+                <li>
+                  <a href="{% url 'registration_register' %}">Sign up</a>
                 </li>
               </ul>
             {% endif %}

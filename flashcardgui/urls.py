@@ -6,7 +6,9 @@ from flashcardgui import views
 
 urlpatterns = [
     url('^$', views.home, name='home'),
+    url('^about/$', views.about, name='about'),
     url('^profile/$', views.profile, name='flashcardgui.views.profile'),
+    url('^add/$', views.add, name='add-card'),
 
 ]
 

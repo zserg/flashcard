@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.authtoken.models import Token
 
 from datetime import datetime, timedelta
@@ -12,6 +13,19 @@ class Deck(models.Model):
     owner = models.ForeignKey(User,on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField()
+
+class FlashcardManager(models.Manager):
+    def create_flashcard(self, user, question, answer, deck_name):
+        try:
+            deck = Deck.objects.get(owner=user, name=deck_name)
+        except ObjectDoesNotExist:
+            deck = Deck(owner=user, name=deck_name)
+            deck.save()
+
+        card = self.create(owner=user, question=question, answer=answer,
+                deck=deck)
+        return deck
+
 
 
 class Flashcard(models.Model):
@@ -24,6 +38,8 @@ class Flashcard(models.Model):
     next_due_date = models.DateTimeField(auto_now_add=True)
     easiness = models.FloatField(default=2.5)
     consec_correct_answers = models.IntegerField(default=0)
+
+    objects = FlashcardManager()
 
     def __str__(self):
         return self.question
@@ -72,6 +88,22 @@ class Flashcard(models.Model):
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
+
+    # owner = models.ForeignKey(User,on_delete=models.CASCADE)
+    # deck = models.ForeignKey(Deck)
+    # question = models.TextField()
+    # answer = models.TextField()
+    # created_at = models.DateTimeField(auto_now_add=True)
+    # last_shown_at = models.DateTimeField(auto_now_add=True)
+    # next_due_date = models.DateTimeField(auto_now_add=True)
+    # easiness = models.FloatField(default=2.5)
+    # consec_correct_answers = models.IntegerField(default=0)
+
+
+
+
+
+
 
 
 
