@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Flashcard Add{% endblock %}
+{% block content %}
+  <form action="{% url 'add-card' %}" method="post">
+     {% csrf_token %}
+     {% bootstrap_form form %}
+     {% bootstrap_field form.deck layout='horizontal' size='sm'%}
+     {% bootstrap_field form.question layout='horizontal' size='sm'%}
+     {% bootstrap_field form.answer layout='horizontal' size='sm'%}
+     {% buttons %}
+       <button type="submit" class="btn btn-primary">
+         {% bootstrap_icon "star" %} Add
+       </button>
+     {% endbuttons %}
+</form>
+{% endblock %}
+
