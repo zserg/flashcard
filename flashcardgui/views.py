@@ -42,6 +42,7 @@ def add(request):
     """
     if request.method == 'POST':
         form=CardForm(request.POST)
+        #import ipdb; ipdb.set_trace()
         if form.is_valid():
             deck_name = form.cleaned_data['deck']
             question = form.cleaned_data['question']

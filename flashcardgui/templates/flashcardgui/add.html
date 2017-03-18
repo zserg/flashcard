@@ -1,19 +1,39 @@
 {% extends "base.html" %}
-{% load bootstrap3 %}
 
 {% block title %}Flashcard Add{% endblock %}
 {% block content %}
-  <form action="{% url 'add-card' %}" method="post">
-     {% csrf_token %}
-     {% bootstrap_form form %}
-     {% bootstrap_field form.deck layout='horizontal' size='sm'%}
-     {% bootstrap_field form.question layout='horizontal' size='sm'%}
-     {% bootstrap_field form.answer layout='horizontal' size='sm'%}
-     {% buttons %}
-       <button type="submit" class="btn btn-primary">
-         {% bootstrap_icon "star" %} Add
-       </button>
-     {% endbuttons %}
-</form>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+        <form action="{% url 'add-card' %}" method="post">
+           {% csrf_token %}
+           <div class="form-group">
+              <label for="{{ form.deck.id_for_label }}">Deck</label>
+              <input type="text" class="form-control" i
+                    name="{{ form.deck.html_name }}"
+                    id="{{ form.deck.id_for_label }}" placeholder="Deck">
+           </div>
+
+           <div class="form-group">
+              <label for="{{ form.question.id_for_label }}">Front</label>
+              <textarea class="form-control" rows=3
+                      id="{{ form.question.id_for_label }}"
+                      name="{{ form.question.html_name }}"></textarea>
+           </div>
+
+           <div class="form-group">
+              <label for="{{ form.answer.id_for_label }}">Back</label>
+              <textarea class="form-control" rows=3
+                        id="{{ form.answer.id_for_label }}"
+                        name="{{ form.answer.html_name }}"></textarea>
+           </div>
+
+           <button type="submit" class="btn btn-default">Add </button>
+        </form>
+    </div>
+  </div>
+<div>
+
+
 {% endblock %}
 
