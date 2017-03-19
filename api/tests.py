@@ -102,7 +102,7 @@ class APITestCase(TestCase):
         deck1 = TestDeck(self.user1);
         deck2 = TestDeck(self.user2);
 
-        response = self.client.get(reverse('deck-details', args=[2]))
+        response = self.client.get(reverse('deck-details', args=[deck2.details['id']]))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, deck2.details)
 

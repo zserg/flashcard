@@ -29,7 +29,7 @@ class FlashcardManager(models.Manager):
 
 class Flashcard(models.Model):
     owner = models.ForeignKey(User,on_delete=models.CASCADE)
-    deck = models.ForeignKey(Deck)
+    deck = models.ForeignKey(Deck,on_delete=models.CASCADE)
     question = models.TextField()
     answer = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

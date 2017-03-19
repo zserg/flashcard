@@ -1,5 +1,7 @@
 import psycopg2
 from config.settings.local import DATABASES
+from datetime import datetime
+from datetime import timedelta
 
 # class Flashcard(models.Model):
 #     owner = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -39,12 +41,24 @@ try:
         user_id = data[0]
         print("User 'test_user' is found (id=%s)"%user_id)
 
+        # remove all cards and decks
+        cur.execute("delete from api_flashcard where owner_id=%s;" % user_id)
+        cur.execute("delete from api_deck where owner_id=%s;" % user_id)
+
         #Create decks
         cur.execute(sql_deck % ('Deck1', 'deck1 description',user_id))
         cur.execute(sql_deck % ('Deck2', 'deck2 description',user_id))
+        cur.execute("select id from api_deck where name='Deck1';")
+        data = cur.fetchone()
+        deck_id = data[0]
 
-        # for i in range(5):
-        #     cur.execute(sql_card % (
+        for i in range(5):
+            cur.execute(sql_card % ('q' + str(i), 'a' + str(i),
+                         datetime.now()-timedelta(days=5), # created
+                         datetime.now()-timedelta(days=5), # last shown
+                         datetime.now(), # next due day
+                         0,0,
+                         user_id, deck_id))
 
         conn.commit()
         cur.close()
