@@ -15,6 +15,12 @@ from config.settings.local import DATABASES
 sql_deck ="""
 INSERT INTO api_deck(name, description, owner_id) VALUES('%s', '%s', '%s');
 """
+sql_card ="""
+INSERT INTO api_flashcard(question, answer, created_at,
+last_shown_at, next_due_date, easiness,
+consec_correct_answers,owner_id, deck_id)
+VALUES('%s', '%s', '%s','%s', '%s', '%s','%s', '%s', '%s');
+"""
 
 # cur.execute("select id from auth_user where username='test_user';")
 
@@ -34,8 +40,11 @@ try:
         print("User 'test_user' is found (id=%s)"%user_id)
 
         #Create decks
-        cur.execute(sql_deck%('Deck1', 'deck1 description',user_id))
-        cur.execute(sql_deck%('Deck2', 'deck2 description',user_id))
+        cur.execute(sql_deck % ('Deck1', 'deck1 description',user_id))
+        cur.execute(sql_deck % ('Deck2', 'deck2 description',user_id))
+
+        # for i in range(5):
+        #     cur.execute(sql_card % (
 
         conn.commit()
         cur.close()
