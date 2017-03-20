@@ -5,6 +5,7 @@ from django.contrib.auth.views import login
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 
 from api.models import Deck, Flashcard
 from .forms import CardForm
@@ -56,6 +57,26 @@ def add(request):
 
     return render(request, 'flashcardgui/add.html', {'form': form})
 
+@login_required
+def study(request, deck_id):
+    """
+    Study cards in the deck
+    """
+    if request.method == 'GET':
+        cards = Flashcard.objects.filter(owner=request.user, deck=deck_id)
+        context = {'user': request.user, 'cards': cards}
+        return render(request, 'flashcardgui/study.html', context)
+
+@login_required
+def get_cards(request, deck_id):
+    """
+    Study cards in the deck
+    """
+    if request.method == 'GET':
+        cards = Flashcard.objects.filter(owner=request.user, deck=deck_id)[:3]
+        #data = {'cards': cards}
+        data = {'cards': '42'}
+        return JsonResponse(data)
 
 
 

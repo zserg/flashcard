@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Flashcard Home{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+       <div class="col-sm-12">
+          {{ cards }}
+       </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+  <script>
+    console.log("Hello");
+    $.ajax({url: 'get_cards/',
+            success: function (result){
+            console.log(result);
+           }
+       }
+    );
+
+  </script>
+{% endblock %}

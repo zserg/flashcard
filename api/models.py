@@ -26,6 +26,8 @@ class FlashcardManager(models.Manager):
                 deck=deck)
         return deck
 
+    def get_cards_to_study(self, user, deck, count=5):
+
 
 class Flashcard(models.Model):
     owner = models.ForeignKey(User,on_delete=models.CASCADE)
