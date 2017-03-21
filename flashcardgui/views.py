@@ -6,9 +6,15 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
+from django.utils import timezone
+
+import random
+from datetime import datetime
 
 from api.models import Deck, Flashcard
 from .forms import CardForm
+
+CARD_LIMIT = 5
 
 @login_required
 def home(request):
@@ -73,9 +79,20 @@ def get_cards(request, deck_id):
     Study cards in the deck
     """
     if request.method == 'GET':
-        cards = Flashcard.objects.filter(owner=request.user, deck=deck_id)[:3]
-        #data = {'cards': cards}
-        data = {'cards': '42'}
+        cards = Flashcard.objects.filter(owner=request.user, deck=deck_id,
+                                         next_due_date__lte=timezone.now())
+        count = len(cards)
+        data = {'count': count, 'cards': []};
+
+        num = count if count < CARD_LIMIT else CARD_LIMIT
+        if num:
+            # generate list of random indexes
+            idx = random.sample(range(count), num)
+            for i in idx:
+                card = cards[i];
+                data['cards'].append({'id': card.pk, 'question': card.question,
+                             'answer': card.answer})
+
         return JsonResponse(data)
 
 
