@@ -85,6 +85,7 @@ def get_cards(request, deck_id):
         data = {'count': count, 'cards': []};
 
         num = count if count < CARD_LIMIT else CARD_LIMIT
+        #import ipdb; ipdb.set_trace()
         if num:
             # generate list of random indexes
             idx = random.sample(range(count), num)

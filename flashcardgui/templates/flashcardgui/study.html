@@ -13,7 +13,7 @@
     </div>
 
     <div class="row">
-       <div class="col-sm-12 text-center" style="min-height: 700px">
+      <div class="col-sm-12 text-center" style="min-height: 300px">
          <div id="question"></div>
          <div id="answer"><hr></div>
        </div>
@@ -33,6 +33,7 @@
     console.log("Hello");
     var cards;
     var idx;
+    var result;
 
     answer_bs = '<button type="button" class="btn btn-primary" id="answer-button">Answer</button>';
     result_bs = '<button type="button" class="btn btn-primary" id="result-0">0</button> \
@@ -44,13 +45,15 @@
 
     function get_cards (){
         $.ajax({url: 'get_cards/',
-                success: function (result){
-                console.log(result);
-                cards = result;
+                success: function (data){
+                console.log(data);
+                cards = data;
+                console.log(cards.counts);
                 if (cards.cards.length) {
                   idx = cards.cards.length-1;
                   show_card(idx);
-               }
+                }
+              }
            });
     }
 
@@ -66,8 +69,46 @@
    function show_answer() {
         $('#answer').show();
         $('#result-row').html(result_bs);
+        $('#result-0').click(push_but);
+        $('#result-1').click(push_but);
+        $('#result-2').click(push_but);
+        $('#result-3').click(push_but);
+        $('#result-4').click(push_but);
+        $('#result-5').click(push_but);
    }
 
+   function push_but(event) {
+     <!-- alert(event.target.id) -->
+       switch (event.target.id){
+         case 'result-0':
+           result = 0;
+           break;
+         case 'result-1':
+           result = 1;
+           break;
+         case 'result-2':
+           result = 2;
+           break;
+         case 'result-3':
+           result = 3;
+           break;
+         case 'result-4':
+           result = 5;
+           break;
+         case 'result-5':
+           result = 5;
+           break;
+       }
+       next_card();
+
+   }
+     <!-- post_answer(result); -->
+     <!-- next_card(); -->
+
+<!-- function next_card() { -->
+<!--         $('#result-row').html(answer_bs); -->
+<!--         $('#answer').hide(); -->
+<!-- }; -->
     console.log("1");
     $('#result-row').html(answer_bs);
     $('#answer-button').click(show_answer);
