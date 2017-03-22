@@ -11,9 +11,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'cardapp',
         'USER': 'myuser',
-        'PASSWORD': 'mypassword',
+        'PASSWORD': '1890',
         'HOST': '',
-        'PORT': '',
+        'PORT': '5433',
     }
 }
 

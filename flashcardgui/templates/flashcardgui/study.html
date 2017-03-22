@@ -5,11 +5,25 @@
 {% block content %}
 <div class="container">
     <div class="row">
-       <div class="col-sm-12">
+       <div class="col-sm-1 col-xs-1" id="buttons">
+         <button type="button" class="btn btn-default">Edit</button>
+       </div>
+       <div class="col-sm-1 col-sm-offset-10 col-xs-1 col-xs-offset-10" id="status">
+       </div>
+    </div>
+
+    <div class="row">
+       <div class="col-sm-12 text-center" style="min-height: 700px">
          <div id="question"></div>
          <div id="answer"><hr></div>
        </div>
     </div>
+
+    <div class="row">
+       <div class="col-sm-12 text-center" id="result-row">
+       </div>
+    </div>
+
 </div>
 
 {% endblock %}
@@ -18,26 +32,45 @@
   <script>
     console.log("Hello");
     var cards;
+    var idx;
 
+    answer_bs = '<button type="button" class="btn btn-primary" id="answer-button">Answer</button>';
+    result_bs = '<button type="button" class="btn btn-primary" id="result-0">0</button> \
+                 <button type="button" class="btn btn-primary" id="result-1">1</button> \
+                 <button type="button" class="btn btn-primary" id="result-2">2</button> \
+                 <button type="button" class="btn btn-primary" id="result-3">3</button> \
+                 <button type="button" class="btn btn-primary" id="result-4">4</button> \
+                 <button type="button" class="btn btn-primary" id="result-5">5</button>';
 
     function get_cards (){
         $.ajax({url: 'get_cards/',
                 success: function (result){
                 console.log(result);
                 cards = result;
-                show_card();
+                if (cards.cards.length) {
+                  idx = cards.cards.length-1;
+                  show_card(idx);
                }
            });
     }
 
-    function show_card () {
+    function show_card (num) {
       if (cards.cards.length) {
-        $('#question').text(cards.cards[0].question);
-        $('#answer').text('<hr>'+cards.cards[0].answer);
+        $('#status').text(cards.count);
+        $('#question').text(cards.cards[num].question);
+        $('#answer').html('<hr>'+cards.cards[num].answer);
+        $('#answer').hide();
       }
     }
 
+   function show_answer() {
+        $('#answer').show();
+        $('#result-row').html(result_bs);
+   }
+
     console.log("1");
+    $('#result-row').html(answer_bs);
+    $('#answer-button').click(show_answer);
     get_cards();
 
   </script>
