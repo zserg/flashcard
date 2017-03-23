@@ -101,6 +101,10 @@ def get_cards(request, deck_id):
         return JsonResponse(data)
     else:
         data = json.loads(str(request.body,'utf-8'))
+        for res in data:
+            card = Flashcard.objects.get(owner=request.user, pk=res['id']);
+            card.save(rating=res['result'])
+
         return JsonResponse({'status': 'OK'})
 
 

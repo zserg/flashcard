@@ -52,7 +52,7 @@ try:
         data = cur.fetchone()
         deck_id = data[0]
 
-        for i in range(5):
+        for i in range(7):
             cur.execute(sql_card % ('q' + str(i), 'a' + str(i),
                          datetime.now()-timedelta(days=5), # created
                          datetime.now()-timedelta(days=5), # last shown
