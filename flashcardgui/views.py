@@ -7,8 +7,10 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.utils import timezone
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 import random
+import json
 from datetime import datetime
 
 from api.models import Deck, Flashcard
@@ -64,6 +66,7 @@ def add(request):
     return render(request, 'flashcardgui/add.html', {'form': form})
 
 @login_required
+@ensure_csrf_cookie
 def study(request, deck_id):
     """
     Study cards in the deck
@@ -78,6 +81,7 @@ def get_cards(request, deck_id):
     """
     Study cards in the deck
     """
+
     if request.method == 'GET':
         cards = Flashcard.objects.filter(owner=request.user, deck=deck_id,
                                          next_due_date__lte=timezone.now())
@@ -95,6 +99,10 @@ def get_cards(request, deck_id):
                              'answer': card.answer})
 
         return JsonResponse(data)
+    else:
+        data = json.loads(str(request.body,'utf-8'))
+        return JsonResponse({'status': 'OK'})
+
 
 
 

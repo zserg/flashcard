@@ -34,6 +34,38 @@
     var cards;
     var idx;
     var result;
+    var post_results = [];
+    var current_card;
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
 
     answer_bs = '<button type="button" class="btn btn-primary" id="answer-button">Answer</button>';
     result_bs = '<button type="button" class="btn btn-primary" id="result-0">0</button> \
@@ -49,21 +81,24 @@
                 console.log(data);
                 cards = data;
                 console.log(cards.counts);
+                post_results.length = 0;
                 if (cards.cards.length) {
-                  idx = cards.cards.length-1;
-                  show_card(idx);
+                  current_card = cards.cards.length-1;
+                  show_card(current_card);
+                }else{
+                  congrad();
                 }
               }
            });
     }
 
     function show_card (num) {
-      if (cards.cards.length) {
         $('#status').text(cards.count);
         $('#question').text(cards.cards[num].question);
         $('#answer').html('<hr>'+cards.cards[num].answer);
         $('#answer').hide();
-      }
+        $('#result-row').html(answer_bs);
+        $('#answer-button').click(show_answer);
     }
 
    function show_answer() {
@@ -99,19 +134,40 @@
            result = 5;
            break;
        }
+       post_results.push({'id': cards.cards[current_card].id,
+                          'result': result});
+       console.log(post_results);
        next_card();
+   }
+
+
+    function next_card() {
+      if (current_card){
+        current_card--;
+        show_card(current_card);
+      }else{
+        console.log(JSON.stringify(post_results));
+        $.ajax({url: "get_cards/",
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify(post_results),
+                success: function (result){
+                    console.log(result);
+                    get_cards();
+                }
+        });
+      }
+    }
+
+   function congrad() {
+     console.log("Congradulations!")
+     $('#result-row').hide();
+     $('#question').text("Congradulations!");
+     $('#answer').hide();
 
    }
-     <!-- post_answer(result); -->
-     <!-- next_card(); -->
 
-<!-- function next_card() { -->
-<!--         $('#result-row').html(answer_bs); -->
-<!--         $('#answer').hide(); -->
-<!-- }; -->
     console.log("1");
-    $('#result-row').html(answer_bs);
-    $('#answer-button').click(show_answer);
     get_cards();
 
   </script>
