@@ -56,8 +56,6 @@ class FlashcardsTestCase(TestCase):
         status = self.client.login(username=self.user_name, password=self.user_pass)
         response = self.client.get(reverse('study', args=[1]))
         self.assertEqual(response.status_code, 200)
-        self.assertIn('decks', response.context)
-        self.assertEqual(response.context['user'].username, self.user_name)
 
 
 
