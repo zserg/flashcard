@@ -6,16 +6,17 @@ from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.authtoken.models import Token
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 
 class Deck(models.Model):
-    owner = models.ForeignKey(User,on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField()
 
     def __str__(self):
         return self.name
+
 
 class FlashcardManager(models.Manager):
     def create_flashcard(self, user, question, answer, deck_name):

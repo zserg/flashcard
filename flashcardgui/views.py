@@ -77,6 +77,7 @@ def study(request, deck_id):
         return render(request, 'flashcardgui/study.html', context)
 
 @login_required
+@ensure_csrf_cookie
 def get_cards(request, deck_id):
     """
     Study cards in the deck
@@ -100,6 +101,7 @@ def get_cards(request, deck_id):
 
         return JsonResponse(data)
     else:
+        #import ipdb; ipdb.set_trace()
         data = json.loads(str(request.body,'utf-8'))
         for res in data:
             card = Flashcard.objects.get(owner=request.user, pk=res['id']);
