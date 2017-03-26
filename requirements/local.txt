@@ -1,6 +1,2 @@
 -r base.txt
-ipython_genutils
-ipython
-ipdb
-psycopg2
 

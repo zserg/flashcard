@@ -35,6 +35,8 @@ SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = env('DEBUG')
 
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
+
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = env.bool('DJANGO_DEBUG', default=False)
 
@@ -164,3 +166,6 @@ REST_FRAMEWORK = {
 
 #django-registrayion config
 ACCOUNT_ACTIVATION_DAYS = 7
+
+print('Debug={}'.format(DEBUG))
+print('Allowed_hosts={}'.format(ALLOWED_HOSTS))
