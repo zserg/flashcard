@@ -33,7 +33,7 @@ if READ_DOT_ENV_FILE:
 
 SECRET_KEY = env('SECRET_KEY')
 
-DEBUG = env('DEBUG')
+DEBUG = env.bool('DEBUG')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
@@ -166,3 +166,5 @@ REST_FRAMEWORK = {
 
 #django-registrayion config
 ACCOUNT_ACTIVATION_DAYS = 7
+
+print(DEBUG)
