@@ -55,6 +55,10 @@ def deck_details(request, deck_id):
         deck = get_object_or_404(Deck, pk=deck_id, owner=request.user)
         serializer = DeckSerializer(deck)
         return Response(serializer.data)
+    elif request.method == 'DELETE':
+        deck = get_object_or_404(Deck, pk=deck_id, owner=request.user)
+        deck.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET', 'POST'])

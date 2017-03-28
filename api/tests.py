@@ -231,13 +231,13 @@ class APITestCase(TestCase):
         self.assertEqual('next_due_date' in response.data, True)
         self.assertEqual(get_inteval(response.data), 0)
 
-    # def test_get_token(self):
-    #     self.client.force_authenticate(user=self.user1, password=self.user1.password)
-    #     import ipdb; ipdb.set_trace()
-    #     data = {'username': self.user1.username, 'password': self.user1.password}
-    #     response = self.client.post(reverse('get-token'), data)
+    # def test_create_card_nonexist_deck(self):
+    #     self.client.force_authenticate(user=self.user1)
+    #     card1 = TestCard(self.user1, deck1, create=False)
+    #     response = self.client.post(reverse('cards-list', args=[deck1.deck.id]),card1.data)
 
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual('token' in response.data, True)
+    #     self.assertEqual(response.status_code, 201)
+    #     self.assertDictContainsSubset(card1.data, response.data)
+
 
 
