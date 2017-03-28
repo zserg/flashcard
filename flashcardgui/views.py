@@ -110,6 +110,21 @@ def get_cards(request, deck_id):
         return JsonResponse({'status': 'OK'})
 
 
+@login_required
+def delete_deck(request):
+    """
+    Delete deck (ajax)
+    """
+    if request.method == 'POST':
+        #import ipdb; ipdb.set_trace()
+        data = json.loads(str(request.body,'utf-8'))
+        if 'deck_id' in data:
+            deck = Deck.objects.get(owner=request.user, pk=data['deck_id'])
+            deck.delete()
+            return JsonResponse({'status': 'OK'})
+
+
+
 
 
 

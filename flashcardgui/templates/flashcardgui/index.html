@@ -21,7 +21,7 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                       <li><a href="#">Rename</a></li>
-                      <li><a href="#">Delete</a></li>
+                      <li><a href="#" onclick="deleteHandler(this, {{ deck.id }});">Delete</a></li>
                     </ul>
                   </div>
               </div>
@@ -29,5 +29,9 @@
           {% endfor %}
 </div>
 
+{% endblock %}
+{% block javascript %}
+{% load static %}
+<script src="{% static "flashcardgui/decks.js" %}"></script>
 {% endblock %}
 
