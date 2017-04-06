@@ -63,7 +63,7 @@ function get_cards (){
 function show_card (num) {
     console.log(num);
     $('#status').text(cards.count);
-    $('#question').text(cards.cards[num].question);
+    $('#question').html(cards.cards[num].question);
     $('#answer').html('<hr>'+cards.cards[num].answer);
     $('#answer').hide();
     $('#result-row').html(answer_bs);

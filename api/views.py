@@ -29,7 +29,10 @@ def decks_list(request):
     List all decks
     """
     if request.method == 'GET':
-        decks = Deck.objects.filter(owner=request.user)
+        if 'name' in request.GET:
+            decks = Deck.objects.filter(owner=request.user, name=request.GET['name'])
+        else:
+            decks = Deck.objects.filter(owner=request.user)
         serializer = DeckSerializer(decks, many=True)
         return Response(serializer.data)
 
@@ -73,6 +76,7 @@ def cards_list(request, deck_id):
         return Response(serializer.data)
 
     elif request.method == 'POST':
+        print(request.data)
         try:
             deck = Deck.objects.get(id=deck_id)
         except ObjectDoesNotExist:
@@ -88,6 +92,7 @@ def cards_list(request, deck_id):
                 serializer.save(owner=request.user, deck=deck)
                 return Response(serializer.data,
                                 status=status.HTTP_201_CREATED)
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_401_BAD_REQUEST)
 
 
@@ -100,6 +105,7 @@ def card_details(request, deck_id, card_id):
         card = get_object_or_404(Flashcard, pk=card_id, deck__id=deck_id,
                                  owner=request.user)
         serializer = CardSerializer(card)
+        print(serializer.data)
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_401_BAD_REQUEST)
 

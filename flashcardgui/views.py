@@ -96,9 +96,12 @@ def get_cards(request, deck_id):
             idx = random.sample(range(count), num)
             for i in idx:
                 card = cards[i];
-                data['cards'].append({'id': card.pk, 'question': card.question,
-                             'answer': card.answer})
+                question = '<p>'+'</p><p>'.join(card.question.split('\r\n'))+'</p>'
+                answer = '<p>'+'</p><p>'.join(card.answer.split('\r\n'))+'</p>'
+                data['cards'].append({'id': card.pk, 'question': question,
+                             'answer': answer})
 
+        print(data)
         return JsonResponse(data)
     else:
         #import ipdb; ipdb.set_trace()

@@ -167,4 +167,5 @@ REST_FRAMEWORK = {
 #django-registrayion config
 ACCOUNT_ACTIVATION_DAYS = 7
 
+SESSION_COOKIE_NAME = 'flashcards_sesionid'
 print(DEBUG)
