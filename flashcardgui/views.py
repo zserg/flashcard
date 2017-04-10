@@ -67,19 +67,17 @@ def add(request):
 @ensure_csrf_cookie
 def study(request, deck_id):
     """
-    Study cards in the deck
+    Study cards page (JS driven)
     """
     if request.method == 'GET':
-        cards = Flashcard.objects.filter(owner=request.user, deck=deck_id)
-        context = {'user': request.user, 'cards': cards}
-        return render(request, 'flashcardgui/study.html', context)
+        return render(request, 'flashcardgui/study.html')
 
 
 @login_required
 @ensure_csrf_cookie
 def get_cards(request, deck_id):
     """
-    Study cards in the deck
+    Get cards to study (ajax)
     """
 
     if request.method == 'GET':

@@ -1,0 +1,6 @@
+[run]
+omit = venv/*
+       manage.py
+
+
+
