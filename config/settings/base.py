@@ -13,13 +13,11 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT_DIR = environ.Path(__file__) - 3
 APPS_DIR = ROOT_DIR.path('project')
 
 env = environ.Env()
 
-# This section added from an update to standards in CookieCutter Django to ensure no errors are encountered at runserver/migrations
 READ_DOT_ENV_FILE = env.bool('DJANGO_READ_DOT_ENV_FILE', default=False)
 
 if READ_DOT_ENV_FILE:
@@ -38,7 +36,7 @@ DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = env.bool('DJANGO_DEBUG', default=False)
+# DEBUG = env.bool('DJANGO_DEBUG', default=False)
 
 
 # Application definition
@@ -61,7 +59,7 @@ LOCAL_APPS = ('api',
               'django.contrib.admin',
               )
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS;
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -98,7 +96,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db(), # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
+    'default': env.db(),  # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
     }
 
 # Password validation
@@ -164,5 +162,5 @@ REST_FRAMEWORK = {
      'PAGE_SIZE': 10
 }
 
-#django-registrayion config
+# django-registrayion config
 ACCOUNT_ACTIVATION_DAYS = 7

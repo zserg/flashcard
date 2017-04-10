@@ -8,9 +8,9 @@ urlpatterns = [
     url(r'^decks/(?P<deck_id>[0-9]+)/$', api_views.deck_details, name='deck-details'),
     url(r'^decks/(?P<deck_id>[0-9]+)/cards/$', api_views.cards_list, name='cards-list'),
     url(r'^decks/(?P<deck_id>[0-9]+)/cards/(?P<card_id>[0-9]+)/$',
-          api_views.card_details, name='card-details'),
+        api_views.card_details, name='card-details'),
     url(r'^decks/(?P<deck_id>[0-9]+)/cards/(?P<card_id>[0-9]+)/ratings/$',
-          api_views.card_ratings, name='card-ratings'),
+        api_views.card_ratings, name='card-ratings'),
 
 ]
 

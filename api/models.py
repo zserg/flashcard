@@ -6,16 +6,17 @@ from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.authtoken.models import Token
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 
 class Deck(models.Model):
-    owner = models.ForeignKey(User,on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField()
 
     def __str__(self):
         return self.name
+
 
 class FlashcardManager(models.Manager):
     def create_flashcard(self, user, question, answer, deck_name):
@@ -25,16 +26,16 @@ class FlashcardManager(models.Manager):
             deck = Deck(owner=user, name=deck_name)
             deck.save()
 
-        card = self.create(owner=user, question=question, answer=answer,
-                deck=deck)
+        self.create(owner=user, question=question, answer=answer,
+                    deck=deck)
         return deck
 
     # def get_cards_to_study(self, user, deck, count=5):
 
 
 class Flashcard(models.Model):
-    owner = models.ForeignKey(User,on_delete=models.CASCADE)
-    deck = models.ForeignKey(Deck,on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    deck = models.ForeignKey(Deck, on_delete=models.CASCADE)
     question = models.TextField()
     answer = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -62,7 +63,6 @@ class Flashcard(models.Model):
         correct = (rating >= 3)
         blank = (rating < 2)
         easiness = self.easiness - 0.8 + 0.28*rating + 0.02*rating**2
-        #import ipdb; ipdb.set_trace()
         if easiness < 1.3:
             easiness = 1.3
         if correct:
@@ -79,37 +79,15 @@ class Flashcard(models.Model):
         return next_due_date, easiness, consec_correct_answers
 
     def save(self, rating=None, *args, **kwargs):
-        #import ipdb; ipdb.set_trace()
         if rating:
-            result =  self.get_next_due_date(rating)
+            result = self.get_next_due_date(rating)
             self.next_due_date = result[0]
             self.easiness = result[1]
             self.consec_correct_answers = result[2]
-        super(Flashcard, self).save(*args, **kwargs) # Call the "real" save() method.
+        super(Flashcard, self).save(*args, **kwargs)  # Call the "real" save() method.
 
 
 @receiver(post_save, sender=User)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
-
-    # owner = models.ForeignKey(User,on_delete=models.CASCADE)
-    # deck = models.ForeignKey(Deck)
-    # question = models.TextField()
-    # answer = models.TextField()
-    # created_at = models.DateTimeField(auto_now_add=True)
-    # last_shown_at = models.DateTimeField(auto_now_add=True)
-    # next_due_date = models.DateTimeField(auto_now_add=True)
-    # easiness = models.FloatField(default=2.5)
-    # consec_correct_answers = models.IntegerField(default=0)
-
-
-
-
-
-
-
-
-
-
-

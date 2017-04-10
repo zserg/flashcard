@@ -15,13 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from django.contrib import auth
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^flashcard/api/v1/', include('api.urls')),
     url(r'^flashcard/', include('flashcardgui.urls')),
-    #url(r'^accounts/logout/$', auth.views.logout, 'registration/logged_out.html'),
     url(r'^accounts/registration/', include('registration.backends.hmac.urls')),
     url(r'^accounts/', include('django.contrib.auth.urls')),
 ]

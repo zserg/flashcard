@@ -1,6 +1,4 @@
-from django.conf.urls import url, include
-from django.contrib.auth import views as auth_views
-
+from django.conf.urls import url
 from flashcardgui import views
 
 
@@ -13,4 +11,3 @@ urlpatterns = [
     url('^study/(?P<deck_id>[0-9]+)/get_cards/$', views.get_cards, name='get-cards'),
 
 ]
-
