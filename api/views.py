@@ -17,7 +17,10 @@ def decks_list(request):
     List all decks
     """
     if request.method == 'GET':
-        decks = Deck.objects.filter(owner=request.user)
+        if 'name' in request.GET:
+            decks = Deck.objects.filter(owner=request.user, name=request.GET['name'])
+        else:
+            decks = Deck.objects.filter(owner=request.user)
         serializer = DeckSerializer(decks, many=True)
         return Response(serializer.data)
 
@@ -25,10 +28,12 @@ def decks_list(request):
         serializer = DeckSerializer(data=request.data)
         if serializer.is_valid():
             if request.user.is_anonymous:
-                return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(serializer.errors,
+                                status=status.HTTP_401_UNAUTHORIZED)
             else:
                 serializer.save(owner=request.user)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.data,
+                                status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -41,6 +46,10 @@ def deck_details(request, deck_id):
         deck = get_object_or_404(Deck, pk=deck_id, owner=request.user)
         serializer = DeckSerializer(deck)
         return Response(serializer.data)
+    elif request.method == 'DELETE':
+        deck = get_object_or_404(Deck, pk=deck_id, owner=request.user)
+        deck.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET', 'POST'])
@@ -58,15 +67,18 @@ def cards_list(request, deck_id):
         try:
             deck = Deck.objects.get(id=deck_id)
         except ObjectDoesNotExist:
-            return Response(serializer.errors, status=status.HTTP_401_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=status.HTTP_401_BAD_REQUEST)
 
         serializer = CardSerializer(data=request.data)
         if serializer.is_valid():
             if request.user.is_anonymous:
-                return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(serializer.errors,
+                                status=status.HTTP_401_UNAUTHORIZED)
             else:
                 serializer.save(owner=request.user, deck=deck)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.data,
+                                status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_401_BAD_REQUEST)
 
 
@@ -76,7 +88,8 @@ def card_details(request, deck_id, card_id):
     Card details
     """
     if request.method == 'GET':
-        card = get_object_or_404(Flashcard, pk=card_id, deck__id=deck_id, owner=request.user)
+        card = get_object_or_404(Flashcard, pk=card_id, deck__id=deck_id,
+                                 owner=request.user)
         serializer = CardSerializer(card)
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_401_BAD_REQUEST)
@@ -88,12 +101,14 @@ def card_ratings(request, deck_id, card_id):
     Card ratings (state)
     """
     if request.method == 'GET':
-        card = get_object_or_404(Flashcard, pk=card_id, deck__id=deck_id, owner=request.user)
+        card = get_object_or_404(Flashcard, pk=card_id, deck__id=deck_id,
+                                 owner=request.user)
         serializer = RatingSeriallizer(card)
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        card = get_object_or_404(Flashcard, pk=card_id, deck__id=deck_id, owner=request.user)
+        card = get_object_or_404(Flashcard, pk=card_id, deck__id=deck_id,
+                                 owner=request.user)
         serializer = RatingSeriallizer(card, data=request.data)
         if serializer.is_valid():
             serializer.save(rating=request.data['rating'])

@@ -76,6 +76,7 @@ def study(request, deck_id):
 
 
 @login_required
+@ensure_csrf_cookie
 def get_cards(request, deck_id):
     """
     Study cards in the deck
@@ -93,8 +94,10 @@ def get_cards(request, deck_id):
             idx = random.sample(range(count), num)
             for i in idx:
                 card = cards[i]
-                data['cards'].append({'id': card.pk, 'question': card.question,
-                                      'answer': card.answer})
+                question = '<p>'+'</p><p>'.join(card.question.split('\r\n'))+'</p>'
+                answer = '<p>'+'</p><p>'.join(card.answer.split('\r\n'))+'</p>'
+                data['cards'].append({'id': card.pk, 'question': question,
+                                     'answer': answer})
 
         return JsonResponse(data)
     else:
@@ -104,3 +107,16 @@ def get_cards(request, deck_id):
             card.save(rating=res['result'])
 
         return JsonResponse({'status': 'OK'})
+
+
+@login_required
+def delete_deck(request):
+    """
+    Delete deck (ajax)
+    """
+    if request.method == 'POST':
+        data = json.loads(str(request.body, 'utf-8'))
+        if 'deck_id' in data:
+            deck = Deck.objects.get(owner=request.user, pk=data['deck_id'])
+            deck.delete()
+            return JsonResponse({'status': 'OK'})

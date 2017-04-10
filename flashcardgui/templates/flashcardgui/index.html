@@ -7,13 +7,13 @@
      <h1>Decks</h1>
         {% for deck in decks %}
            <div class="row deck-row">
-              <div class="col-sm-8">
+              <div class="col-sm-8 col-xs-7">
                   <a href="{% url "study" deck.id %}">{{ deck.name }}</a>
               </div>
-              <div class="col-sm-1">
+              <div class="col-sm-1 col-xs-1">
                   0
               </div>
-              <div class="col-sm-1">
+              <div class="col-sm-1 col-xs-1">
                  <div class="dropdown">
                     <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                       Action
@@ -21,7 +21,7 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                       <li><a href="#">Rename</a></li>
-                      <li><a href="#">Delete</a></li>
+                      <li><a href="#" onclick="deleteHandler(this, {{ deck.id }});">Delete</a></li>
                     </ul>
                   </div>
               </div>
@@ -29,5 +29,9 @@
           {% endfor %}
 </div>
 
+{% endblock %}
+{% block javascript %}
+{% load static %}
+<script src="{% static "flashcardgui/decks.js" %}"></script>
 {% endblock %}
 

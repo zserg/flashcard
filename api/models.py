@@ -12,7 +12,7 @@ from datetime import timedelta
 class Deck(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(default='')
 
     def __str__(self):
         return self.name
