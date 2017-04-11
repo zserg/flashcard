@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
+from django.utils import timezone
+from datetime import timedelta
 
 from itertools import count
 from datetime import datetime
@@ -27,7 +29,8 @@ class TestDeck(object):
 class TestCard(object):
     _ids = count(1)
 
-    def __init__(self, user, deck, easiness=0, consec_correct_answers=0, create=True):
+    def __init__(self, user, deck, easiness=0, consec_correct_answers=0,
+                 create=True, days=0):
         #import ipdb; ipdb.set_trace()
         self.question = 'question_'+str(user)+' '+str(self._ids)
         self.answer = 'answer_'+str(user)+' '+str(self._ids)
@@ -37,7 +40,8 @@ class TestCard(object):
         if create:
             self.card = Flashcard.objects.create(owner = user, deck=deck,
                     question = self.question, answer = self.answer,
-                    easiness = easiness, consec_correct_answers = consec_correct_answers)
+                    easiness = easiness, consec_correct_answers = consec_correct_answers,
+                    next_due_date=(timezone.now()+timedelta(days=days)))
             self.details = {'id': self.card.id, 'question': self.card.question,
                            'answer': self.card.answer, }
 
@@ -55,7 +59,10 @@ def get_inteval(resp_data):
     #import ipdb; ipdb.set_trace()
     last_shown = datetime.strptime(resp_data['last_shown_at'],  "%Y-%m-%dT%H:%M:%S.%fZ")
     next_due = datetime.strptime(resp_data['next_due_date'],  "%Y-%m-%dT%H:%M:%S.%fZ")
-    return (next_due - last_shown).days
+    next_due = next_due.replace(hour=0, minute=0, second=0)
+    last_shown = last_shown.replace(hour=0, minute=0, second=0)
+    return (next_due.replace(hour=0, minute=0, second=0, microsecond=0) -
+            last_shown.replace(hour=0, minute=0, second=0, microsecond=0)).days
 
 class APITestCase(TestCase):
 
@@ -224,20 +231,34 @@ class APITestCase(TestCase):
         response = self.client.post(reverse('card-ratings',
             args=[deck1.deck.id, card1.card.id]), {'rating': 0})
 
-        #import ipdb; ipdb.set_trace()
         self.assertEqual(response.status_code, 202)
         self.assertEqual('easiness' in response.data, True)
         self.assertEqual('last_shown_at' in response.data, True)
         self.assertEqual('next_due_date' in response.data, True)
         self.assertEqual(get_inteval(response.data), 0)
 
-    # def test_create_card_nonexist_deck(self):
-    #     self.client.force_authenticate(user=self.user1)
-    #     card1 = TestCard(self.user1, deck1, create=False)
-    #     response = self.client.post(reverse('cards-list', args=[deck1.deck.id]),card1.data)
+    def test_get_cards_to_study(self):
+        self.client.force_authenticate(user=self.user1)
+        deck1 = TestDeck(self.user1)
+        card1 = TestCard(self.user1, deck1.deck, 0, 0)
+        card2 = TestCard(self.user1, deck1.deck, 0, 0)
+        card3 = TestCard(self.user1, deck1.deck, 0, 0, days=1)
 
-    #     self.assertEqual(response.status_code, 201)
-    #     self.assertDictContainsSubset(card1.data, response.data)
+        response = self.client.get(reverse('cards-list', args=[deck1.deck.id]), {'days': 0})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
+
+    def test_get_cards_to_study(self):
+        self.client.force_authenticate(user=self.user1)
+        deck1 = TestDeck(self.user1)
+        card1 = TestCard(self.user1, deck1.deck, 0, 0)
+        card2 = TestCard(self.user1, deck1.deck, 0, 0, days=3)
+        card3 = TestCard(self.user1, deck1.deck, 0, 0, days=5)
+
+        response = self.client.get(reverse('cards-list', args=[deck1.deck.id]), {'days': 4})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
 
 
 

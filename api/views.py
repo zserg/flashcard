@@ -59,7 +59,11 @@ def cards_list(request, deck_id):
     List all flashcards
     """
     if request.method == 'GET':
-        cards = Flashcard.objects.filter(deck__id=deck_id)
+        if 'days' in request.GET:
+            cards = Flashcard.objects.get_cards_to_study(deck_id=deck_id,
+                    user=request.user, days=int(request.GET['days']))
+        else:
+            cards = Flashcard.objects.filter(deck__id=deck_id, deck__owner=request.user)
         serializer = CardSerializer(cards, many=True)
         return Response(serializer.data)
 

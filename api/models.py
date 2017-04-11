@@ -30,7 +30,12 @@ class FlashcardManager(models.Manager):
                     deck=deck)
         return deck
 
-    # def get_cards_to_study(self, user, deck, count=5):
+    def get_cards_to_study(self, user, deck_id, days):
+        next_due_date = timezone.now() + timedelta(days=days)
+        cards_all = Flashcard.objects.filter(deck__id=deck_id, deck__owner=user)
+        cards = Flashcard.objects.filter(deck__id=deck_id, deck__owner=user,
+                    next_due_date__lte=next_due_date)
+        return cards
 
 
 class Flashcard(models.Model):
@@ -40,7 +45,7 @@ class Flashcard(models.Model):
     answer = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     last_shown_at = models.DateTimeField(auto_now_add=True)
-    next_due_date = models.DateTimeField(auto_now_add=True)
+    next_due_date = models.DateTimeField(default=timezone.now)
     easiness = models.FloatField(default=2.5)
     consec_correct_answers = models.IntegerField(default=0)
 
