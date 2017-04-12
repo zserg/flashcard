@@ -17,6 +17,10 @@ class Deck(models.Model):
     def __str__(self):
         return self.name
 
+    def get_cards_num(self):
+        cards = Flashcard.objects.get_cards_to_study(user=self.owner, deck_id=self.id, days=0)
+        return len(cards)
+
 
 class FlashcardManager(models.Manager):
     def create_flashcard(self, user, question, answer, deck_name):
@@ -31,8 +35,8 @@ class FlashcardManager(models.Manager):
         return deck
 
     def get_cards_to_study(self, user, deck_id, days):
+        ##import ipdb; ipdb.set_trace()
         next_due_date = timezone.now() + timedelta(days=days)
-        cards_all = Flashcard.objects.filter(deck__id=deck_id, deck__owner=user)
         cards = Flashcard.objects.filter(deck__id=deck_id, deck__owner=user,
                     next_due_date__lte=next_due_date)
         return cards

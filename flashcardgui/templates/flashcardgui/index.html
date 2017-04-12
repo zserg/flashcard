@@ -11,7 +11,7 @@
                   <a href="{% url "study" deck.id %}">{{ deck.name }}</a>
               </div>
               <div class="col-sm-1 col-xs-1">
-                  0
+                {{ deck.get_cards_num }}
               </div>
               <div class="col-sm-1 col-xs-1">
                  <div class="dropdown">
