@@ -4,13 +4,17 @@ git clone https://github.com/zserg/flashcard.git
 1. create virtualenv, activate it
 cd flashcard
 virtualenv -p python3 venv
-
-1.1 Setup database:
-create user
-create table
-add permission to user
+. venv/bin/activate
 
 2.2 pip install -r requirements/local.txt
+
+1.1 Setup database:
+create database <base>;
+create user <username> with password <password>;
+grant all on database <base> to user <username>;
+
+2.3 create secret key
+python -c 'import random; import string; print("".join([random.SystemRandom().choice(string.digits + string.ascii_letters + string.punctuation) for i in range(100)]))'
 2. edit .env file:
  DEBUG=on
  ALLOWED_HOSTS='your_host_name'
