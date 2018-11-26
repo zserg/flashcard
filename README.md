@@ -132,7 +132,7 @@ sudo -u postgres psql
 # run commands in psql
 create database <base>;
 create user <username> with password <password>;
-grant all on database <base> to user <username>;
+grant all on database <base> to <username>;
 ```
 ### Django setup
 ```bash
